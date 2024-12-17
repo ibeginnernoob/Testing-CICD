@@ -28,3 +28,16 @@ jobs:
           
             -   name: Verify Pushed Image
                 run: docker pull adheil/myciimage:latest
+
+            -   name: SSH into EC2 instance and deploy
+                uses: appleboy/ssh-action@master
+                with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_USERNAME }}
+                  key: ${{ secrets.MY_EC2_SSH_KEY }}
+                  script: |
+                    sudo docker pull adheil/myciimage:latest
+                    sudo docker stop my-node-app || true
+                    sudo docker rm my-node-app || true
+                    sudo docker run -d -p 3000:3000 --name my-user-app adheil/myciimage:latest
+              
